@@ -13,8 +13,6 @@ var selectedRaceId;
 var pulling = false;
 var reloading = false;
 
-
-
 win.backButtonTitle = 'Cancel';
 
 var saveBtn = Titanium.UI.createButton({
@@ -23,7 +21,7 @@ var saveBtn = Titanium.UI.createButton({
 
 saveBtn.addEventListener('click',function(e){
 	if(selectedRaceId !== -1){
-		Ti.API.info('save button clicked');
+		//Ti.API.info('save button clicked');
 		Titanium.App.Properties.setInt('RaceId',selectedRaceId);
 		dbMain = Titanium.Database.open('main');
 		dbMain.execute('UPDATE settings SET race_id = ? WHERE setting_id = 1',selectedRaceId);
@@ -123,7 +121,7 @@ function populateRaceTable(){
 	var dbRace = Titanium.Database.open('main');
 	var onerow = dbRace.execute("SELECT DATE('now','+2 day')");
 	var todaysdate = onerow.field(0);
-	Ti.API.info(todaysdate);
+	//Ti.API.info(todaysdate);
 	
 	var rows = dbRace.execute("SELECT race_id,race_name,race_date FROM race WHERE DATE(race_date) > DATE('now','-7 day') ORDER BY race_name");
 	var hasValidRow = false;
@@ -196,7 +194,7 @@ function populateRaceTable(){
 		row.add(label);
 		
 		var label2 = Ti.UI.createLabel({
-			text: 'Pull down to refresh list from server.',
+			text: 'Will try to refresh list from server.',
 			color: '#420404',
 			shadowColor:'#FFFFE6',
 			textAlign:'left',
@@ -219,6 +217,23 @@ win.addEventListener('open', function(){
 	populateRaceTable();
 });
 
+/*
+function showSelectedRace(){
+	var raceId = getRaceId();
+	if(raceId > 0){
+		// iterate through the table to see if there is a match with the race id
+		for(i=0; i < raceData.length; i++){
+			if(raceData[i].rid == raceId){
+				//raceData[i].hasCheck = true;
+				Ti.API.info("hasCheck set to true");
+				//var rows = raceData[i].rows;
+				//rows[i].hasCheck = true;
+			}
+		}
+	}
+};
+*/
+
 
 tableviewRaceList.addEventListener('click', function(e){
 	var index = e.index; 
@@ -239,29 +254,30 @@ tableviewRaceList.addEventListener('click', function(e){
 });
 
 function getRaceUpdate(){
+	Ti.API.info("called getRaceUpdate");
 	
 	var xhr = Titanium.Network.createHTTPClient();
 	xhr.onload = function(){
-		Ti.API.info('getRaceUpdate onload function called');
-		Ti.API.info('xml: ' + this.responseXML + ' text ' + this.responseText);
+		//Ti.API.info('getRaceUpdate onload function called');
+		//Ti.API.info('xml: ' + this.responseXML + ' text ' + this.responseText);
 		try{
 			var dbMainRU = Titanium.Database.open('main');
 			var doc = this.responseXML.documentElement;
-			Ti.API.info("doc: "+doc);
+			//Ti.API.info("doc: "+doc);
 			var elements = doc.getElementsByTagName("sql");
 			for(var i=0; i<elements.length; i++){
 				var sql = elements.item(i).text;
-				Ti.API.info("biz_logic - sql: "+sql);
+				//Ti.API.info("biz_logic - sql: "+sql);
 				dbMainRU.execute(sql);
 			}
 		}catch(e){
 			Ti.API.info('getRaceUpdate Error: '+e.error);
 		}
 		reloading = false;
-		lastUpdatedLabel.text = "Last Updated: "+formatDate();
-		statusLabel.text = "Pull down to refresh...";
-		actInd.hide();
-		arrow.show();
+		//lastUpdatedLabel.text = "Last Updated: "+formatDate();
+		//statusLabel.text = "Pull down to refresh...";
+		//actInd.hide();
+		//arrow.show();
 		populateRaceTable();
 		tableviewRaceList.setData(raceData);
 		tableViewRaceList.setContentInsets({top:0},{animated:true});
@@ -274,80 +290,23 @@ function getRaceUpdate(){
 	data.sharedsecret = getSharedSecret();
 	if(Titanium.Network.online == 1){
 		xhr.send(data);
+	}else{
+		noNetWorkAlert.show();
 	}
 	
 };
 
-function beginReloading()
-{
-	Ti.API.info('beginReloading called');
-	getRaceUpdate();
-	// just mock out the reload
-	//setTimeout(endReloading,2000);
-}
-
-function endReloading()
-{
-	Ti.API.info('endReloading called');
-
-	//tableViewRaceList.setContentInsets({top:0},{animated:true});
-	reloading = false;
-	lastUpdatedLabel.text = "Last Updated: "+formatDate();
-	statusLabel.text = "Pull down to refresh...";
-	actInd.hide();
-	arrow.show();
-};
-
-
-tableviewRaceList.addEventListener('scroll',function(e)
-{
-	Ti.API.info('scroll event called');
-	var offset = e.contentOffset.y;
-	Ti.API.info('offset: '+offset+' pulling: '+pulling);
-	if (offset <= -65.0 && !pulling)
-	{
-		var t = Ti.UI.create2DMatrix();
-		t = t.rotate(-180);
-		pulling = true;
-		Ti.API.info('pulling 3: '+pulling);
-		arrow.animate({transform:t,duration:180});
-		statusLabel.text = "Release to refresh...";
-	}
-	else if (pulling && offset > -65.0 && offset < 0)
-	{
-		pulling = false;
-		Ti.API.info('pulling 4: '+pulling);
-		var t = Ti.UI.create2DMatrix();
-		arrow.animate({transform:t,duration:180});
-		statusLabel.text = "Pull down to refresh...";
-	}
-});
-
-tableviewRaceList.addEventListener('scrollEnd',function(e)
-{
-	Ti.API.info('scrollEnd event called');
-	Ti.API.info('pulling: '+pulling);
-	Ti.API.info('reloading: '+reloading);
-	Ti.API.info('e.contentOffset.y: '+e.contentOffset.y);
-	//if (pulling && !reloading && e.contentOffset.y <= -65.0)
-	if(!reloading)
-	{
-		Ti.API.info('pulling 1: '+pulling);
-		reloading = true;
-		pulling = false;
-		arrow.hide();
-		actInd.show();
-		statusLabel.text = "Reloading...";
-		tableviewRaceList.setContentInsets({top:60},{animated:true});
-		arrow.transform=Ti.UI.create2DMatrix();
-		beginReloading();
-		//getRaceUpdate();
-	}
-	Ti.API.info('pulling 2: '+pulling);
+var noNetWorkAlert = Titanium.UI.createAlertDialog({
+	title:'No Network Connection',
+	message:'Unable to contact server for an updated list of races. If your race is not listed, please try again later.'
 });
 
 
 win.add(tableviewRaceList);
+
+win.addEventListener('focus',function(e){
+	getRaceUpdate();
+});
 
 
 
