@@ -72,9 +72,9 @@ function noPartialResults(){
 	if (row.isValidRow()){
 		resultCount = row.field(0);
 	}
+	//Ti.API.info("resultCount: "+resultCount);
 	row.close();
-	rCount = Math.floor(resultCount / 36);
-	if ((resultCount - (rCount * 36)) != 0){
+	if (resultCount != 0){
 		return false;
 	} else {
 		return true;

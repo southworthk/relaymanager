@@ -264,11 +264,11 @@ function getLegReport(reportType){
 			var fn = getRunnerFirstName(setNum);
 			var ln = getRunnerLastInitial(setNum);
 			fn = (ln.length > 0) ? fn + ' ' + ln + '.' : fn;
-			if(legId == 1){
+/*			if(legId == 1){
 				Ti.API.info('start of race from relay_results: '+start);
 				Ti.API.info('actual start of relay: '+getActualStartOfRelay());
 			}
-
+*/
 			if ((end != null) && (end !== 0) && (start != null) && (start !== 0) && (end > start)){
 				//Ti.API.info("it made it here: 1e");
 				displayTime = getDisplayTime(end-start);
@@ -295,6 +295,7 @@ function getLegReport(reportType){
 				Ti.API.info("it made it here: 2c: "+(lid == cl));
 				Ti.API.info("it made it here: 2d: "+(lid === cl));
 */
+				Ti.API.info('currentLeg: '+currentLeg+' legId: '+legId);
 				if(currentLeg > legId){
 					if(reportType === reportTypeEnum.SHORT){
 						if((startLat !== "1") && (startLat !== "-1")){
@@ -306,6 +307,7 @@ function getLegReport(reportType){
 						elevGain + "</td><td colspan=\"3\" align=\"center\">*** missing data ***</td></tr>";
 					}
 				} else if(currentLeg === legId){
+					Ti.API.info('ISGH: 1a');
 					if(reportType === reportTypeEnum.SHORT){
 						if((startLat !== "1") && (startLat !== "-1")){
 							legId = '<a href="https://maps.google.com/maps?q='+startLat+','+startLon+'&hl=en&t=h&z=16">'+legId+'</a>';

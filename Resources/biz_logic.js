@@ -1509,7 +1509,7 @@ function relayResultCleanup(){
 	
 	for(i = 0; i < results.length; i++){
 		if(results[i][0] == 1){ // for leg id 1
-			Ti.API.info('cleanup, leg '+results[i][0]+' start: '+ results[i][2]);
+			//Ti.API.info('cleanup, leg '+results[i][0]+' start: '+ results[i][2]);
 			var asor = getActualStartOfRelay();
 			if(results[i][2] !== asor){
 				dbMainrRC.execute('UPDATE relay_results SET leg_start = ? WHERE race_id = ? AND leg_id = 1',asor,results[i][1]);
@@ -1517,7 +1517,7 @@ function relayResultCleanup(){
 		} else if(results[i][0] > 1){
 			// if the start time for one leg does not equal the end time of the previous, make the correction
 			// if the end time has a network status of 1 or 3
-			Ti.API.info('cleanup, leg '+results[i][0]+' start: '+ results[i][2]+', previous leg end:'+results[i-1][3]);
+			//Ti.API.info('cleanup, leg '+results[i][0]+' start: '+ results[i][2]+', previous leg end:'+results[i-1][3]);
 			if(results[i][2] !== results[i-1][3]){ 
 					dbMainrRC.execute('UPDATE relay_results SET leg_start = ? WHERE race_id = ? AND leg_id = ?',results[i][2],results[i][1],results[i][0]);
 			}

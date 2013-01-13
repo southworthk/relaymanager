@@ -346,7 +346,8 @@ function checkForUpdate(){
 						Ti.API.info('IGH, getNetworkStatusForLeg: '+getNetworkStatusForLeg(legNumber));
 						Ti.API.info('IGH, relay result start time: '+getStartTimeForLeg(legNumber));
 						Ti.API.info('IGH, relay result finish time: '+getFinishTimeForLeg(legNumber));
-						if((raceId > 0) && (legNumber > 0) && (getNetworkStatusForLeg(legNumber) !== 3)){
+						var networkLegStatus = getNetworkStatusForLeg(legNumber);
+						if((raceId > 0) && (legNumber > 0) && networkLegStatus !== 3){
 							Ti.API.info("IGH, 1b:");
 							if(legNumber == 1){
 								getActualStartTimeFromServer();
@@ -357,28 +358,14 @@ function checkForUpdate(){
 							if(ct == null){
 								ct = 0;
 							}
-							Ti.API.info("IGH, 2b:");
 							dbMain.execute("DELETE FROM relay_results WHERE race_id = ? AND leg_id = ?",raceId,legNumber);
 							dbMain.execute("INSERT INTO relay_results(race_id,leg_id,leg_start,leg_end) VALUES (?,?,?,?)",raceId,legNumber,legStart,ct);
 							legNumber++;
-							if(legNumber !== 37){
-								dbMain.execute("UPDATE settings SET start_of_leg = ?,current_leg = ? WHERE setting_id = 1",ct,legNumber);
-								currentLeg = legNumber;
-								legStartTime = ct;
-								currentTime = parseInt(ct);
-								legLabel.text = 'Leg '+legNumber;
-								var setNum = getSetNumberForLegNum(currentLeg);
-								Ti.API.info('executed, checkForUpdate: '+currentLeg);
-								runnerLabel.text = getRunner(setNum);
-								setDistanceLabel(currentLeg,targetEnum.TIMER);
-								Titanium.App.Properties.setInt('CurrentLeg',currentLeg);
-								Titanium.App.Properties.setDouble('StartOfLeg',currentTime);
-								Ti.API.info("IGH, 3b:");
-							} else {
-								currentLeg = 37;
-								legStartTime = elements.item(36).text;
-								recordEndOfRace(ct);
-							}
+							advanceLegNumber(ct,legNumber);
+						}else if((cLeg == legNumber) && networkLegStatus == 3){
+							ct = getFinishTimeForLeg(legNumber);
+							legNumber++;
+							advanceLegNumber(ct,legNumber)
 						}
 					} // if(getNetworkStatusForLeg(legNumber))
 	
@@ -407,7 +394,30 @@ function checkForUpdate(){
 	}
 };
 
-
+/*
+ *  This function advances the legNumber as the result of an update from the server
+ *  parameters
+ *  ct: currentTime
+ *  legNumber
+ */
+function advanceLegNumber(ct,legNumber){
+	if(legNumber !== 37){
+		dbMain.execute("UPDATE settings SET start_of_leg = ?,current_leg = ? WHERE setting_id = 1",ct,legNumber);
+		currentLeg = legNumber;
+		legStartTime = ct;
+		currentTime = parseInt(ct);
+		legLabel.text = 'Leg '+legNumber;
+		var setNum = getSetNumberForLegNum(currentLeg);
+		runnerLabel.text = getRunner(setNum);
+		setDistanceLabel(currentLeg,targetEnum.TIMER);
+		Titanium.App.Properties.setInt('CurrentLeg',currentLeg);
+		Titanium.App.Properties.setDouble('StartOfLeg',currentTime);
+	} else {
+		currentLeg = 37;
+		legStartTime = elements.item(36).text;
+		recordEndOfRace(ct);
+	}	
+};
 
 /*
  * checks for update of finish time of the current leg on the server
