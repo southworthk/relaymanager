@@ -249,7 +249,7 @@ function getLegReport(reportType){
 			if((end == 0) && (legId < currentLeg)){
 				end = getStartTimeForLeg(legId+1);				
 			}
-			//Ti.API.info('leg: '+legId+' start: '+start+' end: '+end);
+			Ti.API.info('leg: '+legId+' start: '+start+' end: '+end);
 			var dist = rows.field(3);
 			var setNum = rows.field(4);
 			var rating = rows.field(5);

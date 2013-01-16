@@ -49,7 +49,7 @@ if (Titanium.Platform.name == 'iPhone OS')
 var versionNumber = Titanium.UI.createLabel({
 	top: 360,
 	color:'#333333',
-	text:'Version 1.7',
+	text:'Version 1.7.1',
 	font:{fontSize:10,fontFamily:'Helvetica Neue'},
 	width:'auto',
 	height:'auto'

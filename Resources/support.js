@@ -28,7 +28,7 @@ Ti.include('get_displaytime.js');
 
 function getAbout(){
 	htmlStr = '<html><body>';
-	htmlStr += '<h3>RelayManager</h3>Version 1.7<br>Copyright 2010 SineQuaNon Solutions<p>';
+	htmlStr += '<h3>RelayManager</h3>Version 1.7.1<br>Copyright 2010 SineQuaNon Solutions<p>';
 	if(hoActive){
 		htmlStr += 'Handoff key: ...'+hoKey.substring(35)+'<br>';
 		htmlStr += 'Team key: ...'+teamKey.substring(30)+'<br>';
@@ -49,7 +49,7 @@ function getAbout(){
 
 function getContactInfo(){
 	htmlStr = '<html><body>';	
-	htmlStr += '<h3>RelayManager 1.7</h3>';
+	htmlStr += '<h3>RelayManager 1.7.1</h3>';
 	htmlStr += 'If you have any questions, suggestions or problems using this software, please don&apos;t hesitate to get in touch ';
 	htmlStr += 'with us. We will work quickly to resolve any issues that you might have. Please contact us at:<p>';
 	htmlStr += '<b>support@sinequanonsolutions.com</b><br><br> ';
@@ -220,7 +220,7 @@ function notifyFriend(){
 		}).show();
 		return;
 	}
-	emailDialog01.setSubject('Relay Manager 1.7');
+	emailDialog01.setSubject('Relay Manager 1.7.1');
 	//emailDialog01.setToRecipients(['']);
 	emailDialog01.setMessageBody('Relay Manager is the top-rated iPhone app for a thirty-six leg relay races! Check it out <a href="http://itunes.apple.com/us/app/relay-manager/id378080198?mt=8">here</a>.');
 	emailDialog01.setHtml(true);
@@ -348,7 +348,7 @@ function contactSupport(){
 		}).show();
 		return;
 	}
-	emailDialog02.setSubject('Relay Manager 1.7');
+	emailDialog02.setSubject('Relay Manager 1.7.1');
 	emailDialog02.setToRecipients(['support@sinequanonsolutions.com']);
 	emailDialog02.addEventListener('complete',function(e)
 	{

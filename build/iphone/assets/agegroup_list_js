@@ -1,3 +1,57 @@
-var win=Ti.UI.currentWindow;win.barColor='black';Ti.UI.setBackgroundColor('#000');var tableData=[];var previousRowData;var selectedId;win.backButtonTitle='Cancel';var saveBtn=Ti.UI.createButton({title:'Save'});saveBtn.addEventListener('click',function(e){var agId=selectedId;Ti.App.Properties.setInt('AgeGroupId',agId);Ti.API.info('age group id: '+agId);win.setRightNavButton(null);win.backButtonTitle='Return';});win.setRightNavButton(null);var tableview=Ti.UI.createTableView({data:tableData});tableview.addEventListener('click',function(e){win.setRightNavButton(saveBtn);if(previousRowData!=null){previousRowData.hasCheck=false;}
-selectedId=e.rowData.test;e.rowData.hasCheck=true;previousRowData=e.rowData;});win.add(tableview);win.addEventListener('open',function(){var dbTable=Ti.Database.open('main');var rows=dbTable.execute('SELECT agegroup_id,desc FROM agegroup_lk ORDER BY agegroup_id');while(rows.isValidRow()){var agegroupId=rows.field(0);var desc=rows.field(1);tableData.push({title:desc,hasChild:false,test:agegroupId});rows.next();}
-rows.close();dbTable.close();tableview.setData(tableData);});
+var win = Ti.UI.currentWindow;
+win.barColor = 'black';
+
+// this sets the background color of the master UIView (when there are no windows/tab groups on it)
+Ti.UI.setBackgroundColor('#000');
+
+var tableData = [];
+var previousRowData;
+var selectedId;
+
+win.backButtonTitle = 'Cancel';
+
+var saveBtn = Ti.UI.createButton({
+	title:'Save'
+});
+
+saveBtn.addEventListener('click',function(e){
+	var agId = selectedId;
+	Ti.App.Properties.setInt('AgeGroupId',agId); 
+	Ti.API.info('age group id: '+agId);
+	win.setRightNavButton(null);
+	win.backButtonTitle = 'Return';
+});
+
+win.setRightNavButton(null);
+
+//create table view
+var tableview = Ti.UI.createTableView({
+	data:tableData
+});
+
+tableview.addEventListener('click', function(e){
+	win.setRightNavButton(saveBtn);
+	if(previousRowData != null){
+		previousRowData.hasCheck = false;
+	}
+	selectedId = e.rowData.test;
+	e.rowData.hasCheck = true;
+	previousRowData = e.rowData;
+});
+
+win.add(tableview);
+
+win.addEventListener('open', function(){
+	var dbTable = Ti.Database.open('main');
+	var rows = dbTable.execute('SELECT agegroup_id,desc FROM agegroup_lk ORDER BY agegroup_id');
+	while(rows.isValidRow()){
+		var agegroupId = rows.field(0);
+		var desc = rows.field(1);
+		tableData.push({title:desc, hasChild:false, test:agegroupId});
+		rows.next();
+	}
+	rows.close();
+	dbTable.close();
+	tableview.setData(tableData);
+});
+

@@ -5,6 +5,7 @@ var MILLISECONDS_PER_YEAR = 31556736000;
 var MILLISECONDS_PER_DAY = 86400000;
 var MILLISECONDS_PER_HOUR = 3600000;
 var MILLISECONDS_PER_MINUTE = 60000;
+var cfulTime = 0;
 
 function getSharedSecret(){
 	return SHARED_SECRET_VALUE;
@@ -1175,8 +1176,11 @@ function getFinishTimeForLeg(legNum){
  */
 
 function checkForUnsentLegs(){
-	if(Ti.Network.online == 1){ // don't bother checking if you don't have a network connection
+	var now = new Date();
+	var ms = now.getTime(); // need to wait at least two minutes between checks
+	if((Ti.Network.online == 1) && (ms > (cfulTime+120000))){ // don't bother checking if you don't have a network connection
 		var currLeg = getCurrentLeg();
+		updateServerWithCurrentLeg(currLeg);
 		var prevLegFinishTime = 0;
 		var prevLegStartTime = 0;
 		
@@ -1189,7 +1193,7 @@ function checkForUnsentLegs(){
 			}else{
 				prevLegFinishTime = getActualStartOfRelay();
 			}
-			Ti.API.info("CFUL status for leg "+i+" is "+status);
+			//Ti.API.info("CFUL status for leg "+i+" is "+status);
 			if (status === 0){ // this indicates missing information for a leg less than the current leg
 				if((i > 1) && (prevLegFinishTime < 100000)){
 					requestServerStatusForLeg(i-1);
@@ -1204,7 +1208,6 @@ function checkForUnsentLegs(){
 				}
 				if((ft > 0) && (i > 0)){
 					setServerStatusForLeg(i,ft);
-					//updateServerWithCurrentLeg();
 				}
 			// } else if ((status === 3) && (i > 1) && (prevLegFinishTime !== currLegStartTime)){
 				// setNetworkStatusForLeg(i,0);
@@ -1215,6 +1218,7 @@ function checkForUnsentLegs(){
 			//prevLegFinishTime = currLegFinishTime;
 			//prevLegStartTime = currLegStartTime;	
 		}
+		cfulTime = ms;
 	}
 
 };
@@ -1452,13 +1456,15 @@ function getSetNumberForLegNum(legNum){
 	
 };
 
-function updateServerWithCurrentLeg(){
+function updateServerWithCurrentLeg(currLeg){
 	Ti.API.info("called updateServerWithCurrentLeg");
 	var uSWCLUpdate = Titanium.Network.createHTTPClient();
 	uSWCLUpdate.open('POST','http://sinequanonsolutions.appspot.com/teamsync');
 	
 	var uSWCLData = {};
 	uSWCLData.procId = "7";
+	uSWCLData.currentLeg = currLeg;
+	uSWCLData.prevLegStatus = getNetworkStatusForLeg(currLeg-1);
 	uSWCLData.ss = SHARED_SECRET_VALUE;
 	uSWCLData.handoff_key = getHandoffKey();
 	uSWCLData.prediction_key = getTeamPredictionKey();
@@ -1483,6 +1489,7 @@ function relayResultCleanup(){
 		rid = rowrRC.field(1);	// race id
 		ls = rowrRC.field(2);	// leg start
 		le = rowrRC.field(3); 	// leg end
+		Ti.API.info('lid: '+lid+', rid: '+rid+', ls: '+ls+', le: '+le);
 
 		if(lid == prevLeg+1){
 			result[0] = lid;
@@ -1522,8 +1529,12 @@ function relayResultCleanup(){
 					dbMainrRC.execute('UPDATE relay_results SET leg_start = ? WHERE race_id = ? AND leg_id = ?',results[i][2],results[i][1],results[i][0]);
 			}
 			// if the leg end is 0 and the next leg start is greater than 0, set the leg end to the next leg start
-			if(results[i][3] == 0 && i < 36 && results.length > i && results[i+1][2] > 0){
-				dbMainrRC.execute('UPDATE relay_results SET leg_end = ? WHERE race_id = ? AND leg_id = ?',results[i+1][2],results[i][1],results[i][0]);
+			try{
+				if(results[i][3] == 0 && i < 36 && results.length > i && results[i+1][2] > 0){
+					dbMainrRC.execute('UPDATE relay_results SET leg_end = ? WHERE race_id = ? AND leg_id = ?',results[i+1][2],results[i][1],results[i][0]);
+				}
+			}catch(e){
+				Ti.API.info('No results for i+1');
 			}
 
 		} else {

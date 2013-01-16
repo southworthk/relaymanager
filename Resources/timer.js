@@ -367,7 +367,14 @@ function checkForUpdate(){
 							legNumber++;
 							advanceLegNumber(ct,legNumber)
 						}
-					} // if(getNetworkStatusForLeg(legNumber))
+					} else if(cLeg == 37){ // if(legNumber >= cLeg) // kms
+							var legEnd = elements.item(i).text;
+							if(legEnd > 100000){
+								dbMain.execute("DELETE FROM relay_results WHERE race_id = ? AND leg_id = 36",raceId);
+								dbMain.execute("INSERT INTO relay_results(race_id,leg_id,leg_start,leg_end) VALUES (?,36,?,0)",raceId,legStart,legEnd);
+								recordEndOfRace(legEnd);
+							}
+					}
 	
 				} // for(var i=0;
 					
@@ -401,8 +408,12 @@ function checkForUpdate(){
  *  legNumber
  */
 function advanceLegNumber(ct,legNumber){
+	if(raceId == -1){
+		raceId = getRaceId();
+	}
 	if(legNumber !== 37){
 		dbMain.execute("UPDATE settings SET start_of_leg = ?,current_leg = ? WHERE setting_id = 1",ct,legNumber);
+		dbMain.execute("INSERT INTO relay_results(race_id,leg_id,leg_start,leg_end) VALUES (?,?,?,0)",raceId,legNumber,ct);
 		currentLeg = legNumber;
 		legStartTime = ct;
 		currentTime = parseInt(ct);
@@ -789,7 +800,7 @@ function recordEndOfRace(finalTime){
 		dbMain.execute("UPDATE settings SET current_leg = 37, end_of_relay = ?, ready_to_start = 0 WHERE setting_id = 1",finalTime);
 		Ti.API.info('recorded end of race, finalTime: '+finalTime);
 		Ti.API.info('recordEndofRace currentLeg: '+getCurrentLeg());
-		showEndOfRaceDisplay(); //kms
+		showEndOfRaceDisplay(); 
 };
 
 function showEndOfRaceDisplay(){

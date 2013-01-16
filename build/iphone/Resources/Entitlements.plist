@@ -2,15 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
-
-		<key>application-identifier</key>
-		<string>33E79JRXTQ.com.sinequanonsolutions.relaymgr</string>
-		<key>get-task-allow</key>
-		<false/>
-		<key>keychain-access-groups</key>
-		<array>
-			<string>33E79JRXTQ.com.sinequanonsolutions.relaymgr</string>
-		</array>
-		
+<key>get-task-allow</key>
+		<true/>
 	</dict>
 </plist>
