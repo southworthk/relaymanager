@@ -10,7 +10,7 @@
     </deployment-targets>
     <id>com.sinequanonsolutions.relaymgr</id>
     <name>RelayMgr</name>
-    <version>2.5</version>
+    <version>2.6</version>
     <publisher>SineQuaNon Solutions</publisher>
     <url>http://sinequanonsolutions.com</url>
     <description>Application for managing 36 leg relays</description>

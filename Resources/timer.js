@@ -4,6 +4,8 @@ var secTextColor = 'DDDDDD';
 var enabledForHandoff = false;
 var teamPredictionKey = "";
 var trackingEnabled = 0;
+var cfUpdateTime = 0;
+var cfulTime = 0;
 
 win.barColor = 'black';
 var dbMain;
@@ -367,7 +369,7 @@ function checkForUpdate(){
 							legNumber++;
 							advanceLegNumber(ct,legNumber)
 						}
-					} else if(cLeg == 37){ // if(legNumber >= cLeg) // kms
+					} else if(cLeg == 37){ // if(legNumber >= cLeg) 
 							var legEnd = elements.item(i).text;
 							if(legEnd > 100000){
 								dbMain.execute("DELETE FROM relay_results WHERE race_id = ? AND leg_id = 36",raceId);
@@ -395,7 +397,12 @@ function checkForUpdate(){
 	Ti.API.info("checking for update, currentLeg: "+currentLeg);
 	data.currentLeg = currentLeg;
 	if((raceIsOver !== 1) && (Titanium.Network.online == 1)){
-		xhrUpdate.send(data);
+		var now = new Date();
+		var ms = now.getTime();
+		if (ms > (cfUpdateTime + 120000)){ // make sure that it's at least two minutes between requests
+			xhrUpdate.send(data);
+			cfUpdateTime = ms;
+		}
 	}else{
 		clearInterval(listenerStopWatch);
 	}
@@ -1098,8 +1105,10 @@ function setPrevNextButtons(){
 
 
 win.addEventListener('focus',function(e){
-	Ti.API.info("timer focus event fired");
-	//dbMain = Titanium.Database.open('main');
+	//Ti.API.info("timer focus event fired");
+	cfUpdateTime = 0;
+	cfulTime = 0;
+
 	dbMain = Titanium.Database.open('main');
 	var rowCL = dbMain.execute('SELECT current_leg,end_of_relay,race_id,start_of_leg FROM settings WHERE setting_id = 1');
 	if (rowCL.isValidRow()){
@@ -1110,7 +1119,7 @@ win.addEventListener('focus',function(e){
 	}
 	rowCL.close();	
 	setPrevNextButtons();
-	Ti.API.info('focus event, current leg: '+currentLeg);
+	//Ti.API.info('focus event, current leg: '+currentLeg);
 
 	if(endOfRelay > 0){
 		if(currentLeg !== 37){
@@ -1119,14 +1128,14 @@ win.addEventListener('focus',function(e){
 		showEndOfRaceDisplay();
 	} else {
 		row = dbMain.execute("SELECT team_prediction_key, tracking_enabled, team_key FROM team_identity WHERE team_id = 1");
-		Ti.API.info('executed query for focus event');
+		//Ti.API.info('executed query for focus event');
 		if(row.isValidRow()){
 			teamPredictionKey = row.field(0);
-			Ti.API.info('tpk: '+teamPredictionKey);
+			//Ti.API.info('tpk: '+teamPredictionKey);
 			trackingEnabled = row.field(1);
-			Ti.API.info('te: '+trackingEnabled);
+			//Ti.API.info('te: '+trackingEnabled);
 			teamKey = row.field(2);
-			Ti.API.info('teamKey: '+teamKey);
+			//Ti.API.info('teamKey: '+teamKey);
 		}
 		row.close();
 		var handoffStatus = dbMain.execute("SELECT active,handoff_key,timekeeper,listen FROM handoff_status WHERE handoff_id = 1");
@@ -1137,10 +1146,10 @@ win.addEventListener('focus',function(e){
 			listenerStatus = handoffStatus.field(3);
 		}
 		handoffStatus.close();
-		Ti.API.info("active: "+activeStatus);
-		Ti.API.info("hok: "+handoffKey);
-		Ti.API.info("tks: "+timeKeeper);
-		Ti.API.info("ls: "+listenerStatus);
+		//Ti.API.info("active: "+activeStatus);
+		//Ti.API.info("hok: "+handoffKey);
+		//Ti.API.info("tks: "+timeKeeper);
+		//Ti.API.info("ls: "+listenerStatus);
 		if((activeStatus == 1) && (timeKeeper == 0)){
 			handoffButton.hide();
 		}

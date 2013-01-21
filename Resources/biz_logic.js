@@ -5,7 +5,6 @@ var MILLISECONDS_PER_YEAR = 31556736000;
 var MILLISECONDS_PER_DAY = 86400000;
 var MILLISECONDS_PER_HOUR = 3600000;
 var MILLISECONDS_PER_MINUTE = 60000;
-var cfulTime = 0;
 
 function getSharedSecret(){
 	return SHARED_SECRET_VALUE;
@@ -1397,7 +1396,7 @@ function sendHeartbeatToServer(){
 function getHeartbeatFromServer(){
 	var hbfSUpdate = Titanium.Network.createHTTPClient();
 	hbfSUpdate.onload = function(){
-		Ti.API.info('requestLegUpdate onload function called');
+		Ti.API.info('getHeartbeatFromServer onload function called');
 		try{
 			var doc = this.responseXML.documentElement;
 			var elements = doc.getElementsByTagName("last_heartbeat");

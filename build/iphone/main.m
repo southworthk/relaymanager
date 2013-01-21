@@ -7,12 +7,12 @@
 #define _QUOTEME(x) #x
 #define STRING(x) _QUOTEME(x)
 
-NSString * const TI_APPLICATION_DEPLOYTYPE = @"development";
+NSString * const TI_APPLICATION_DEPLOYTYPE = @"production";
 NSString * const TI_APPLICATION_ID = @"com.sinequanonsolutions.relaymgr";
 NSString * const TI_APPLICATION_PUBLISHER = @"SineQuaNon Solutions";
 NSString * const TI_APPLICATION_URL = @"http://sinequanonsolutions.com";
 NSString * const TI_APPLICATION_NAME = @"RelayMgr";
-NSString * const TI_APPLICATION_VERSION = @"2.5";
+NSString * const TI_APPLICATION_VERSION = @"2.6";
 NSString * const TI_APPLICATION_DESCRIPTION = @"Application for managing 36 leg relays";
 NSString * const TI_APPLICATION_COPYRIGHT = @"2010 by SineQuaNon Solutions";
 NSString * const TI_APPLICATION_GUID = @"f2512192-2a41-4873-a576-5077dfc240c5";
